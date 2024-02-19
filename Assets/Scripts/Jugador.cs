@@ -24,9 +24,22 @@ public class Jugador : MonoBehaviour
     [Range(1, 500)] public float potenciaSalto;
 
 
-
     // Para la utilización del Animator del jugador
     private Animator animator;
+
+
+
+
+
+
+    // 19/02/2024: ENEMIGOS
+    // Para control cuando coincida con enemigos; cuando se haga daño, que haga un momento durante el que no pueda recibir daño
+    public bool vulnerable;
+
+    // 19/02/2024: POWER-UPS
+    public int puntuacion;
+
+
 
 
 
@@ -38,6 +51,10 @@ public class Jugador : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>(); // cojo el rigidbody de ESE componente
         spRd = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+
+        // 19/02/2024
+        vulnerable = true;
+        puntuacion = 0;
     }
 
     // Update is called once per frame
@@ -107,5 +124,39 @@ public class Jugador : MonoBehaviour
             isJumping = false;
             rb2d.velocity = new Vector2(rb2d.velocity.x, 0);
         }
+    }
+
+
+
+    // 19/02/2024
+    public void QuitarVida()
+    {
+        if (vulnerable)
+        {
+            // AQUÍ TAMBIÉN SE VA A HACER EL QUITAR VIDA.
+
+            vulnerable = false;
+            // invoke se usa para invocar un método cuando pase un determinado método
+            // se le pasan por parámetros el nombre del método y el tiempo en segundos float
+            // "cuando pase un segundo, vuelve a hacerlo vulnerable"
+            Invoke("HacerVulnerable", 1f);
+            // cuando nos toquen, vamos a estar en rojo y no podemos perder vida hasta que volvamos a ser vulnerables
+            spRd.color = Color.red;
+        }
+    }
+
+    private void HacerVulnerable()
+    {
+        vulnerable = true;
+        // Para dejar el color original:
+        spRd.color = Color.white;
+    }
+
+    // se reciben una cantidad de puntos a incrementar según el power-up recogido
+    public void IncrementarPuntos(int cantidad)
+    {
+        puntuacion += cantidad;
+        Debug.Log("Has cogido: " + cantidad + " puntos.");
+        Debug.Log("Puntuación toal: " + puntuacion);
     }
 }
