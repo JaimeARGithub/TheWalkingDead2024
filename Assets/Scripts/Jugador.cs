@@ -39,7 +39,17 @@ public class Jugador : MonoBehaviour
     // 19/02/2024: POWER-UPS
     public int puntuacion;
 
+    // 21/02/2024: VIDAS
+    private GameManager gameManager;
 
+    // 21/02/2024: Control de canvas
+    public Canvas canvas;
+    private ControlHud hud;
+
+    // Control del tiempo
+    public int tiempoEmpleado; // pasar a private tras las pruebas
+    public float tiempoInicio; // pasar a private tras las pruebas
+    public int tiempoNivel;
 
 
 
@@ -52,9 +62,24 @@ public class Jugador : MonoBehaviour
         spRd = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
+
         // 19/02/2024
         vulnerable = true;
         puntuacion = 0;
+
+
+        // 21/02/2024
+        gameManager = FindObjectOfType<GameManager>();
+
+        // 21/02/2024: Control de canvas
+        hud = canvas.GetComponent<ControlHud>();
+        // Cojo las variables globales del juego del Game Manager
+        hud.setVidasTxt(gameManager.getVidas());
+
+
+        // Control del tiempo:
+        tiempoInicio = Time.time;
+        // y me voy al updat
     }
 
     // Update is called once per frame
@@ -110,6 +135,16 @@ public class Jugador : MonoBehaviour
         } else {
             animator.SetBool("isWalking", false);
         }
+
+
+
+        // PARA EL CONTROL DEL TIEMPO
+        tiempoEmpleado = (int)(Time.time - tiempoInicio);
+        if ((tiempoNivel - tiempoEmpleado) < 0)
+        {
+            // fin del juego
+        }
+        hud.setTiempoText(tiempoNivel - tiempoEmpleado);
     }
 
     // MÉTODO QUE SE EJECUTA SIEMPRE QUE HAY UNA COLISIÓN
@@ -139,6 +174,20 @@ public class Jugador : MonoBehaviour
             // invoke se usa para invocar un método cuando pase un determinado método
             // se le pasan por parámetros el nombre del método y el tiempo en segundos float
             // "cuando pase un segundo, vuelve a hacerlo vulnerable"
+
+
+            // 21/02/2024
+            gameManager.decrementarVidas();
+            // para mostrar la vida cuando baje
+            hud.setVidasTxt(gameManager.getVidas());
+            if (gameManager.getVidas()==0)
+            {
+                // hacer cosas cuando la vida caiga a cero
+                // cargar una escena con un cartelito que muestre la puntuación final
+                // y luego volver al menú principal
+            }
+
+
             Invoke("HacerVulnerable", 1f);
             // cuando nos toquen, vamos a estar en rojo y no podemos perder vida hasta que volvamos a ser vulnerables
             spRd.color = Color.red;
@@ -156,7 +205,8 @@ public class Jugador : MonoBehaviour
     public void IncrementarPuntos(int cantidad)
     {
         puntuacion += cantidad;
-        Debug.Log("Has cogido: " + cantidad + " puntos.");
-        Debug.Log("Puntuación toal: " + puntuacion);
+        
+        // 21/02/2024 CONTROL DE PUNTOS
+        hud.setPuntuacionesTxt(puntuacion);
     }
 }
