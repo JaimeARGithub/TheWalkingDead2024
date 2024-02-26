@@ -1,6 +1,8 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Jugador : MonoBehaviour
 {
@@ -52,6 +54,12 @@ public class Jugador : MonoBehaviour
     public int tiempoNivel;
 
 
+    // 26/02/2024 Variables para el movimiento del Joystick
+    public Joystick joystick;
+    public Button boton;
+    private float movimientoH;
+    private float movimientoV;
+
 
 
     // Start is called before the first frame update
@@ -88,7 +96,19 @@ public class Jugador : MonoBehaviour
         // en cada frame compruebo si me muevo a derecha (1), izquierda (-1) o estoy parado (0)
         // input -> lo que inserto para jugar
 
-        float movimientoH = Input.GetAxisRaw("Horizontal");
+        //float movimientoH = Input.GetAxisRaw("Horizontal");
+
+
+        // sensibilidad de movimiento del joystick para que haya movimiento (a drch o izq)
+        if (joystick.Horizontal >= 0.2f | joystick.Horizontal <= 0.2f)
+        {
+            movimientoH = joystick.Horizontal;
+        } else
+        {
+            movimientoH = 0f;
+        }
+
+
 
         // vector2: dos componentes, eje x y eje y
         // muñeco parado -> velocidad 0, movimiento 0; con la velocidad controlo cuánto avanza el pj
@@ -114,7 +134,10 @@ public class Jugador : MonoBehaviour
 
 
         // si se ha presionado el botón de salto Y no estoy ya saltando
-        if (Input.GetButton("Jump") && !isJumping)
+        // UPDATE 26/02/2024 PARA EL SALTO
+        //if (Input.GetButton("Jump") && !isJumping)
+        movimientoV = joystick.Vertical;
+        if (movimientoV >= 0.5f & !isJumping)
         {
             // añado una fuerza al rigidbody; vector de ascenso 2D multiplicado por la potencia de salto
             // en el vector 2D: la X se queda en 0, la Y pasa a 1; la potencia de salto se aplica a la Y
@@ -126,6 +149,9 @@ public class Jugador : MonoBehaviour
 
             // cuando el moñeco toque el suelo (se detecte una colisión contra el suelo), se reasigna
             // la variable y se puede volver a saltar
+        } else
+        {
+            movimientoV = 0f;
         }
 
 
@@ -208,5 +234,16 @@ public class Jugador : MonoBehaviour
         
         // 21/02/2024 CONTROL DE PUNTOS
         hud.setPuntuacionesTxt(puntuacion);
+    }
+
+    // 26/02/2024 MÉTODO PARA QUE SALTE CON EL BOTÓN
+    public void saltoBoton()
+    {
+        if (!isJumping)
+        {
+            rb2d.velocity = new Vector2(rb2d.velocity.x, potenciaSalto);
+
+            isJumping = true;
+        }
     }
 }

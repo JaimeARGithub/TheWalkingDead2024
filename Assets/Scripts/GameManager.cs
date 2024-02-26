@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameManager);
 
         // Y cargo mi escena, que normalmente va a ser la primera
-        cambiarEscena("SampleScene");
+        cambiarEscena("Menu");
     }
 
     // Update is called once per frame
